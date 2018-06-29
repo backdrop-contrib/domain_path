@@ -290,6 +290,13 @@ function domain_path_form_node_form_alter(&$form, $form_state) {
     );
   }
 
+  $format = domain_select_format();
+
+  $form['domain_path']['#attached']['js'][] = array(
+    'data' => array('domainPath' => array('fieldType' => $format)),
+    'type' => 'setting',
+  );
+
   $paths = array();
   $domains = domain_domains();
   $current = t('<none>');
@@ -323,8 +330,10 @@ function domain_path_form_node_form_alter(&$form, $form_state) {
       '#title' => check_plain($domain['path']),
       '#default_value' => $path ? $path : $default,
       '#access' => user_access('edit domain paths'),
+      '#attributes' => array('data-domain_id' => $domain_id),
     );
   }
+
   $form['domain_path']['domain_path_delete'] = array(
     '#type' => 'checkbox',
     '#title' => t('Delete domain-specific aliases'),
