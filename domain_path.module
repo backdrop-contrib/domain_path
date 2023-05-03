@@ -317,7 +317,8 @@ function domain_path_form_node_form_alter(&$form, $form_state) {
   foreach ($domains as $domain_id => $domain) {
     $path = FALSE;
     if ($nid) {
-      $path = domain_path_lookup_path('alias', 'node/' . $nid, $domain_id);
+      $lang = empty($form['#node']->language) ? NULL : $form['#node']->language;
+      $path = domain_path_lookup_path('alias', 'node/' . $nid, $domain_id, $lang);
     }
 
     $default = '';
