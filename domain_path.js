@@ -1,8 +1,8 @@
 (function ($) {
 
-  Drupal.behaviors.domainPath = {
+  Backdrop.behaviors.domainPath = {
     attach: function (context, settings) {
-      Drupal.domainPath.init(context);
+      Backdrop.domainPath.init(context);
     }
   };
 
@@ -10,38 +10,38 @@
    * Function to check for checked state in domain access options, and only show
    * domain path fields if the domain access is enabled.
    */
-  Drupal.domainPath = {
+  Backdrop.domainPath = {
     /**
      * Determine Domain selection format.
      */
     domainSelectorType: function () {
-      return Drupal.settings.domainPath.fieldType == 0 ? 'checkbox' : 'select';
+      return Backdrop.settings.domainPath.fieldType == 0 ? 'checkbox' : 'select';
     },
     /**
      * Select a selector depending on the domain selection format.
      */
     domainSelector: function () {
-      return Drupal.domainPath.domainSelectorType() === 'checkbox' ? '#edit-domains .form-checkbox' : '#edit-domains.form-select';
+      return Backdrop.domainPath.domainSelectorType() === 'checkbox' ? '#edit-domains .form-checkbox' : '#edit-domains.form-select';
     },
     init: function (context) {
       // Initial state for path fields.
-      Drupal.domainPath.showHideAll();
+      Backdrop.domainPath.showHideAll();
 
       // The user doesn't have access to the domain settings so go ahead and
       // show the path field for domain that was set from the form.
-      if (Drupal.settings.hasOwnProperty('domainPath') && Drupal.settings.domainPath.hasOwnProperty('domainId')) {
-        Drupal.domainPath.showHide(Drupal.settings.domainPath.domainId, 'show');
+      if (Backdrop.settings.hasOwnProperty('domainPath') && Backdrop.settings.domainPath.hasOwnProperty('domainId')) {
+        Backdrop.domainPath.showHide(Backdrop.settings.domainPath.domainId, 'show');
       }
 
       // Check to see if Publish to all is checked, if so, show all fields
       $('#edit-domain-site').bind('change', function () {
-        Drupal.domainPath.showHideAll();
+        Backdrop.domainPath.showHideAll();
       });
 
       // Bind the click event on the SelectorType and check for "checked" then
       // hide or show the domain path div accordingly.
-      $(Drupal.domainPath.domainSelector()).change(function () {
-        Drupal.domainPath.showHideSelectedDomain(this);
+      $(Backdrop.domainPath.domainSelector()).change(function () {
+        Backdrop.domainPath.showHideSelectedDomain(this);
       });
     },
 
@@ -63,8 +63,8 @@
     showHideAll: function () {
       // Hide all just incase the user doesn't have access to all domains.
       $('#edit-domain-path .form-type-textfield').css('display', 'none');
-      $(Drupal.domainPath.domainSelector()).each(function (index) {
-        Drupal.domainPath.showHideSelectedDomain(this);
+      $(Backdrop.domainPath.domainSelector()).each(function (index) {
+        Backdrop.domainPath.showHideSelectedDomain(this);
       });
     },
 
@@ -72,14 +72,14 @@
      * Show or hide the path field for the corresponding domain.
      */
     showHide: function (domainId, state) {
-      var selectorType = Drupal.domainPath.domainSelectorType();
-      var isDomainSite = Drupal.domainPath.isDomainSite();
+      var selectorType = Backdrop.domainPath.domainSelectorType();
+      var isDomainSite = Backdrop.domainPath.isDomainSite();
 
       if (selectorType === 'checkbox') {
-        Drupal.domainPath.showHideCheckbox(domainId, isDomainSite, state);
+        Backdrop.domainPath.showHideCheckbox(domainId, isDomainSite, state);
       }
       if (selectorType === 'select') {
-        Drupal.domainPath.showHideSelect(domainId, isDomainSite, state);
+        Backdrop.domainPath.showHideSelect(domainId, isDomainSite, state);
       }
     },
 
@@ -123,10 +123,10 @@
       var domainId = $(selector).val();
 
       if ($(selector).is(':checked')) {
-        Drupal.domainPath.showHide(domainId, 'show');
+        Backdrop.domainPath.showHide(domainId, 'show');
       }
       else {
-        Drupal.domainPath.showHide(domainId);
+        Backdrop.domainPath.showHide(domainId);
       }
     }
   }

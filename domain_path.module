@@ -81,7 +81,7 @@ function domain_path_domain_path($domain_id, &$path, &$options, $original_path) 
     $path = $alias;
     $options['alias'] = TRUE;
   }
-  elseif($alias = drupal_get_path_alias($original_path, $path_language)) {
+  elseif ($alias = backdrop_get_path_alias($original_path, $path_language)) {
     $path = $alias;
     $options['alias'] = TRUE;
   }
@@ -97,17 +97,17 @@ function domain_path_url_inbound_alter(&$path, $original_path, $path_language) {
 }
 
 /**
- * Heavily modeled after drupal_lookup_path().
+ * Heavily modeled after backdrop_lookup_path().
  *
- * Given an domain specific alias, return its Drupal system URL if one exists. Given a Drupal
+ * Given an domain specific alias, return its Backdrop system URL if one exists. Given a Backdrop
  * system URL return one of its domain specific aliases if such a one exists. Otherwise,
  * return FALSE.
  *
  * @param $action
  *   One of the following string values:
  *   - wipe: delete the alias cache.
- *   - alias: return an alias for a given Drupal system path (if one exists).
- *   - source: return the Drupal system URL for a path alias (if one exists).
+ *   - alias: return an alias for a given Backdrop system path (if one exists).
+ *   - source: return the Backdrop system URL for a path alias (if one exists).
  * @param $path
  *   The path string to investigate for corresponding domain aliases or system URLs.
  * @param $domain_id
@@ -118,51 +118,67 @@ function domain_path_url_inbound_alter(&$path, $original_path, $path_language) {
  *   language.
  *
  * @return
- *   Either a Drupal system path, an aliased path, or FALSE if no path was
+ *   Either a Backdrop system path, an aliased path, or FALSE if no path was
  *   found.
  */
 function domain_path_lookup_path($action, $path = '', $domain_id = NULL, $path_language = NULL) {
   global $language_url;
   global $_domain;
 
-  // Use the advanced drupal_static() pattern, since this is called very often.
-  static $drupal_static_fast;
-  if (!isset($drupal_static_fast)) {
-    $drupal_static_fast['cache'] = &drupal_static(__FUNCTION__);
+  if (!is_array($_domain)) {
+    $_domain = array();
   }
-  $cache = &$drupal_static_fast['cache'];
+
+  $_domain = domain_default(TRUE);
+
+  // Use the advanced backdrop_static() pattern, since this is called very often.
+  static $backdrop_static_fast;
+  if (!isset($backdrop_static_fast)) {
+    $backdrop_static_fast['cache'] = &backdrop_static(__FUNCTION__);
+  }
+  $cache = &$backdrop_static_fast['cache'];
 
   if ($action == 'wipe' || !isset($cache)) {
-    $cache = array(
-      'map' => array(),
-      'no_aliases' => array(),
-      'no_sources' => array(),
-      'domain_id' => $_domain['domain_id'],
-    );
+    if(isset($_domain['domain_id']) && !empty($_domain['domain_id'])){
+      $cache = array(
+        'map' => array(),
+        'no_aliases' => array(),
+        'no_sources' => array(),
+        'domain_id' => $_domain['domain_id'],
+      );
+    }
   }
 
   // Check and load domain_id and cache if necessary.
-  if ($domain_id == NULL || $domain_id == $cache['domain_id']) {// Null or the same don't do anything.
-    $domain_id = $cache['domain_id'];
+  if(isset($cache['domain_id']) && !empty($cache['domain_id'])) {
+    if ($domain_id == NULL || $domain_id == $cache['domain_id']) { // Null or the same don't do anything.
+      $domain_id = $cache['domain_id'];
+    }
   }
-  elseif($domain = domain_load($domain_id)) {// A differnt domain is wanted.
+  elseif ($domain = domain_load($domain_id)) { // A differnt domain is wanted.
     $cache['domain_id'] = $domain_id = $domain['domain_id'];
   }
-  else {// Bad id? Oh well load current domain again just to make sure.
-    $cache['domain_id'] = $domain_id = $_domain['domain_id'];
+  else { // Bad id? Oh well load current domain again just to make sure.
+    if(isset($_domain['domain_id']) && !empty($_domain['domain_id'])) {
+      $cache['domain_id'] = $domain_id = $_domain['domain_id'];
+    }
   }
 
   // If no language is explicitly specified we default to the current URL
   // language. If we used a language different from the one conveyed by the
   // requested URL, we might end up being unable to check if there is a path
   // alias matching the URL path.
-  $path_language = $path_language ? $path_language : $language_url->language;
+  $language = '';
+  if(isset($language_url->language)){
+    $language = $language_url->language;
+  }
+  $path_language = $path_language ? $path_language : $language;
   // If the alias has already been loaded, return it.
   if (isset($cache['map'][$domain_id][$path_language][$path])) {
     return $cache['map'][$domain_id][$path_language][$path];
   }
 
-  // Lookup Drupal system path.
+  // Lookup Backdrop system path.
   if ($action == 'source') {
     // Check $cache['no_sources'] for this $path in case we've already determined that there
     // isn't a path that has this alias.
@@ -193,10 +209,10 @@ function domain_path_lookup_path($action, $path = '', $domain_id = NULL, $path_l
       }
 
 
-      if ($source) {// Source was found, store and return it.
+      if ($source) { // Source was found, store and return it.
         $cache['map'][$domain_id][$path_language][$path] = $source;
       }
-      else {// No source found store in no_sources for future lookups.
+      else { // No source found store in no_sources for future lookups.
         $cache['no_sources'][$domain_id][$path_language][$path] = TRUE;
       }
 
@@ -261,7 +277,7 @@ function domain_path_form_node_form_alter(&$form, $form_state) {
     '#group' => 'additional_settings',
     '#access' => user_access('edit domain paths'),
     '#attached' => array(
-      'js' => array(drupal_get_path('module', 'domain_path') . '/domain_path.js'),
+      'js' => array(backdrop_get_path('module', 'domain_path') . '/domain_path.js'),
     ),
   );
 
@@ -303,7 +319,7 @@ function domain_path_form_node_form_alter(&$form, $form_state) {
 
   $path = $nid = FALSE;
   if (!empty($form['#node']->nid)) {
-    $current = drupal_get_path_alias('node/' . $form['#node']->nid);
+    $current = backdrop_get_path_alias('node/' . $form['#node']->nid);
     $nid = $form['#node']->nid;
   }
 
@@ -317,7 +333,7 @@ function domain_path_form_node_form_alter(&$form, $form_state) {
   foreach ($domains as $domain_id => $domain) {
     $path = FALSE;
     if ($nid) {
-      $lang = empty($form['#node']->language) ? NULL : $form['#node']->language;
+      $lang = empty($form['#node']->language)?NULL : $form['#node']->language;
       $path = domain_path_lookup_path('alias', 'node/' . $nid, $domain_id, $lang);
     }
 
@@ -328,7 +344,7 @@ function domain_path_form_node_form_alter(&$form, $form_state) {
     // TODO: Only exposed checked domains?
     $form['domain_path'][$domain_id] = array(
       '#type' => 'textfield',
-      '#title' => check_plain($domain['path']),
+      '#title' => check_plain($domain['subdomain']),
       '#default_value' => $path ? $path : $default,
       '#access' => user_access('edit domain paths'),
       '#attributes' => array('data-domain_id' => $domain_id),
@@ -371,11 +387,11 @@ function domain_path_node_validate($node, $form, &$form_state) {
         AND language = :language
         AND source != :source",
         array(
-          ':domain_id' => $key,
-          ':alias' => $path,
-          ':language' => isset($node->language) ? $node->language : LANGUAGE_NONE,
-          ':source' => "node/$node->nid",
-        )
+        ':domain_id' => $key,
+        ':alias' => $path,
+        ':language' => isset($node->language) ? $node->language : LANGUAGE_NONE,
+        ':source' => "node/$node->nid",
+      )
       );
       if ($query->fetchField() > 0) {
         $domain = domain_lookup($domain_id);
@@ -464,11 +480,11 @@ function domain_path_path_save(&$path, $reset = TRUE) {
   }
 
   if (empty($path['dpid'])) {
-    drupal_write_record('domain_path', $path);
+    backdrop_write_record('domain_path', $path);
     module_invoke_all('domain_path_insert', $path);
   }
   else {
-    drupal_write_record('domain_path', $path, array('dpid'));
+    backdrop_write_record('domain_path', $path, array('dpid'));
     module_invoke_all('domain_path_update', $path);
   }
 
@@ -477,7 +493,7 @@ function domain_path_path_save(&$path, $reset = TRUE) {
 
   if ($reset) {
     // Rebuild the node alias.
-    drupal_static_reset('domain_path_lookup_path');
+    backdrop_static_reset('domain_path_lookup_path');
   }
 }
 
@@ -496,7 +512,7 @@ function domain_path_save_paths($paths) {
     }
   }
   // Rebuild the node alias.
-  drupal_static_reset('domain_path_lookup_path');
+  backdrop_static_reset('domain_path_lookup_path');
 }
 
 /**
@@ -511,7 +527,7 @@ function domain_path_path_delete($criteria) {
     $criteria = array('dpid' => $criteria);
   }
   elseif (empty($criteria['domain_id'])) {
-    return;// Should we put in a watchdog error?
+    return; // Should we put in a watchdog error?
   }
 
   $path = domain_path_path_load($criteria);
