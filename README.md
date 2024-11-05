@@ -7,8 +7,7 @@ The Domain Path module allows the creation of separate path aliases per domain f
 
 Installation
 ------------
-- Install this module using the official Backdrop CMS instructions at
-  https://docs.backdropcms.org/documentation/extend-with-modules.
+- Install this module using the [official Backdrop CMS instructions](https://backdropcms.org/guide/modules).
 - TBC
 
 Issues
