@@ -25,7 +25,7 @@ Current Maintainers
 
 - [Tim Erickson](https://github.com/stpaultim) - [Simplo by Triplo](https://simplo.site/)
 - [Sudipto Kumar Mitra](https://github.com/sudipto68)
-- Collaboration and co-maintainers welcome! REALLY, REALLY WELCOME!!
+- Collaboration and co-maintainers welcome!
 
 Credits
 -------
