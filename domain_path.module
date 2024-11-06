@@ -125,12 +125,6 @@ function domain_path_lookup_path($action, $path = '', $domain_id = NULL, $path_l
   global $language_url;
   global $_domain;
 
-  if (!is_array($_domain)) {
-    $_domain = array();
-  }
-
-  $_domain = domain_default(TRUE);
-
   // Use the advanced backdrop_static() pattern, since this is called very often.
   static $backdrop_static_fast;
   if (!isset($backdrop_static_fast)) {
@@ -344,7 +338,7 @@ function domain_path_form_node_form_alter(&$form, $form_state) {
     // TODO: Only exposed checked domains?
     $form['domain_path'][$domain_id] = array(
       '#type' => 'textfield',
-      '#title' => check_plain($domain['subdomain']),
+      '#title' => check_plain($domain['path']),
       '#default_value' => $path ? $path : $default,
       '#access' => user_access('edit domain paths'),
       '#attributes' => array('data-domain_id' => $domain_id),

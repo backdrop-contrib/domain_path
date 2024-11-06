@@ -3,14 +3,11 @@ Domain Path
 <!--
 |<- - - - - - - This line is exactly 80 characters for reference - - - - - - ->|
 -->
-WORK IN PROGRESS - this module is very buggy, please do not use on production
-sites. However, please DO test this module, report bugs, and submit PRs. 
-
+The Domain Path module allows the creation of separate path aliases per domain for nodes created using the [Domain Access](https://github.com/backdrop-contrib/domain) module. The module is ready for testing, but requires [Domain Access](https://github.com/backdrop-contrib/domain) to work correctly.
 
 Installation
 ------------
-- Install this module using the official Backdrop CMS instructions at
-  https://docs.backdropcms.org/documentation/extend-with-modules.
+- Install this module using the [official Backdrop CMS instructions](https://backdropcms.org/guide/modules).
 - TBC
 
 Issues
@@ -27,6 +24,7 @@ Current Maintainers
 -------------------
 
 - [Tim Erickson](https://github.com/stpaultim) - [Simplo by Triplo](https://simplo.site/)
+- [Sudipto Kumar Mitra](https://github.com/sudipto68)
 - Collaboration and co-maintainers welcome! REALLY, REALLY WELCOME!!
 
 Credits
